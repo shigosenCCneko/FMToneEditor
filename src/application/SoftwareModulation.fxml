@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="631.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SoftwareModulationController">
+   <top>
+      <Pane prefHeight="631.0" prefWidth="700.0" BorderPane.alignment="CENTER">
+         <children>
+            <Canvas fx:id="canvas1" height="260.0" layoutX="14.0" layoutY="27.0" width="280.0" />
+            <Canvas fx:id="canvas2" height="260.0" layoutX="302.0" layoutY="27.0" width="280.0" />
+            <Canvas fx:id="canvas3" height="260.0" layoutX="14.0" layoutY="308.0" width="280.0" />
+            <Canvas fx:id="canvas4" height="260.0" layoutX="302.0" layoutY="308.0" width="280.0" />
+            <Button layoutX="646.0" layoutY="277.0" mnemonicParsing="false" onAction="#onCloseAction" text="Close">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Button>
+            <Button fx:id="set_sin" layoutX="611.0" layoutY="54.0" mnemonicParsing="false" onAction="#set_sin" prefHeight="25.0" prefWidth="70.0" text="Sin" />
+            <Button fx:id="set_sin_1_3" layoutX="611.0" layoutY="84.0" mnemonicParsing="false" onAction="#set_sin_1_3" prefHeight="25.0" prefWidth="70.0" text="Sin 1 3" />
+            <Button fx:id="set_sin_1_3_5" layoutX="611.0" layoutY="114.0" mnemonicParsing="false" onAction="#set_sin_1_3_5" prefHeight="25.0" prefWidth="70.0" text="Sin 1 3 5" />
+            <Button fx:id="set_rect" layoutX="611.0" layoutY="144.0" mnemonicParsing="false" onAction="#set_rect" prefHeight="25.0" prefWidth="70.0" text="Rect" />
+            <Button fx:id="set_rand" layoutX="611.0" layoutY="204.0" mnemonicParsing="false" onAction="#set_rand" prefHeight="25.0" prefWidth="70.0" text="Random" />
+            <Button fx:id="set_saw" layoutX="611.0" layoutY="174.0" mnemonicParsing="false" onAction="#set_saw" prefHeight="25.0" prefWidth="70.0" text="Saw" />
+            <Button fx:id="wave_clear" layoutX="611.0" layoutY="12.0" mnemonicParsing="false" onAction="#wave_clear" prefHeight="25.0" prefWidth="56.0" text="Clear" />
+            <CheckBox fx:id="quarterSel" layoutX="523.0" layoutY="7.0" mnemonicParsing="false" text="Quarter" />
+            <CheckBox fx:id="setMinus" layoutX="442.0" layoutY="7.0" mnemonicParsing="false" text="Minus" />
+            <TextArea fx:id="waveText" layoutX="213.0" layoutY="572.0" prefHeight="52.0" prefWidth="426.0" />
+            <Button fx:id="readText" layoutX="643.0" layoutY="413.0" mnemonicParsing="false" onAction="#read_data" text="Read" />
+            <Button fx:id="writeText" layoutX="642.0" layoutY="362.0" mnemonicParsing="false" onAction="#write_data" text="Write" />
+            <RadioButton fx:id="operator1" layoutX="102.0" layoutY="5.0" mnemonicParsing="false" onAction="#selectOperator1" selected="true" text="OP1 from">
+               <toggleGroup>
+                  <ToggleGroup fx:id="operatorSelect" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="operator2" layoutX="337.0" layoutY="3.0" mnemonicParsing="false" onAction="#selectOperator2" text="OP2 from" toggleGroup="$operatorSelect" />
+            <RadioButton fx:id="operator1_2" layoutX="107.0" layoutY="290.0" mnemonicParsing="false" onAction="#selectOperator1_2" text="OP1 to" toggleGroup="$operatorSelect" />
+            <RadioButton fx:id="operator2_2" layoutX="350.0" layoutY="290.0" mnemonicParsing="false" onAction="#selectOperator2_2" text="OP2 to" toggleGroup="$operatorSelect" />
+         </children>
+      </Pane>
+   </top>
+</BorderPane>
