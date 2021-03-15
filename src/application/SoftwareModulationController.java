@@ -260,6 +260,8 @@ public class SoftwareModulationController implements Observer {
 		for(int i = 0; i < 4;i++) {
 			wg[i].strokeLine(0, 31*scaleY, 256*scaleX, 31*scaleY);
 		}
+		
+		
 
 //---1-----------------------------------------------------------------
 		for(int i = 0;i< 4;i++) {

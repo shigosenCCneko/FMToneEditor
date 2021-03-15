@@ -1,6 +1,7 @@
 package application;
 
 import CustomComponent.MySlider;
+import CustomComponent.MySliderEvent;
 import CustomComponent.OperatorPanel;
 import DataClass.FMDEVICE;
 import MyEvent.MyDataEvent;
@@ -66,6 +67,19 @@ public class FMToneEditorController implements MyDataListener , Observer{
 		operator2.addListener(this);
 		operator3.addListener(this);
 		operator4.addListener(this);		
+
+		feedBack1.addEventHandler(MySliderEvent.MYCHANGE_VALUE,
+				event->	changeValue(null,eventSource.FeedBK,0,  event.getEventValue())	);
+				
+		/*					
+		feedBack2.addEventHandler(MySliderEvent.MYCHANGE_VALUE,
+				event->	changeValue(null,eventSource.FeedBK2,2,event.getEventValue() 	));
+		sliderLFO.addEventHandler(MySliderEvent.MYCHANGE_VALUE,
+				event->	changeValue(null,eventSource.Lfo,0,  event.getEventValue()  )	);
+		sliderBO.addEventHandler(MySliderEvent.MYCHANGE_VALUE,
+				event->	changeValue(null,eventSource.BO,0,  event.getEventValue()    )	);
+
+*/				
 		
 		fmDevice = FMDEVICE.getInstance();
 		setPanel();
@@ -81,8 +95,8 @@ public class FMToneEditorController implements MyDataListener , Observer{
 	
 	public void changeValue(EventType<MyDataEvent> e, eventSource source, int opNo,int val) {
 		// TODO 自動生成されたメソッド・スタブ
-		System.out.print(source);
-		System.out.println( opNo + "=" + val);
+//		System.out.print(source);
+//		System.out.println( opNo + "=" + val);
 		fmDevice.setValue(source, currentChannel, opNo, val);
 
 	}

@@ -378,8 +378,8 @@ class FMCHANNEL{
 				//break;
 
 			}
-
-			midiDev.send_command(10,ch,source.ordinal() +  16 * opno, val);
+			/* opno  上位2bit */
+			midiDev.send_command(10,ch,source.getNumber() +  64 * opno, val);
 
 	}
 
@@ -390,7 +390,7 @@ class FMCHANNEL{
 			for(int i= 0;i <CHANNEL_VAL;i++){
 				for(int j = 0; j < MAX_OPERATOR;j++) {
 					setValue(eventSource.SLIDER1, i, j, 15);
-					fmchannel[i].operator[j].attack = 15;
+					fmchannel[i].operator[j].attack = 255;
 					fmchannel[i].operator[j].decey = 0;
 					fmchannel[i].operator[j].sustain = 0;
 					fmchannel[i].operator[j].sustainLevel = 0;
@@ -409,44 +409,55 @@ class FMCHANNEL{
 					fmchannel[i].operator[j].morph = 0;
 					fmchannel[i].operator[j].morph_once = 0;
 						
+					fmchannel[i].operator[j].waveSelect = 0;
+					fmchannel[i].operator[j].waveSelect2 = 0;
+					
+					fmchannel[i].operator[j].morph = 0;
+					fmchannel[i].operator[j].morph_once = 0;
+					
 				}
 			}
 			for( int ch = 0;ch < CHANNEL_VAL;ch++) {
 				for(int opno = 0;opno< MAX_OPERATOR;opno++) {
-					midiDev.send_command(eventSource.SLIDER1.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.SLIDER1.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].attack);
-					midiDev.send_command(eventSource.SLIDER2.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.SLIDER2.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].decey);
-					midiDev.send_command(eventSource.SLIDER3.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.SLIDER3.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].sustain);
-					midiDev.send_command(eventSource.SLIDER4.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.SLIDER4.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].sustainLevel);
-					midiDev.send_command(eventSource.SLIDER5.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.SLIDER5.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].release);
-					midiDev.send_command(eventSource.SLIDER6.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.SLIDER6.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].multiple);
-					midiDev.send_command(eventSource.SLIDER7.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.SLIDER7.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].totalLevel);
-					midiDev.send_command(eventSource.Wave.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.Wave.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].waveSelect);
-					midiDev.send_command(eventSource.Wave2.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.Wave2.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].waveSelect2);
-					midiDev.send_command(eventSource.Ksl.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.Ksl.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].ksl);
-					midiDev.send_command(eventSource.DT.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.DT.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].dt);
-					midiDev.send_command(eventSource.EAM.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.EAM.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].eam);
-					midiDev.send_command(eventSource.Dam.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.Dam.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].dam);
-					midiDev.send_command(eventSource.EVB.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.EVB.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].evb);
-					midiDev.send_command(eventSource.Dvb.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.Dvb.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].dvb);
-					midiDev.send_command(eventSource.Morf.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.Morf.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].morph);
-					midiDev.send_command(eventSource.MorphOnce.ordinal(), ch, opno, 
+					midiDev.send_command(eventSource.MorphOnce.getNumber(), ch, opno, 
 							fmchannel[ch].operator[opno].morph_once);
+					
+					midiDev.send_command(eventSource.Wave.getNumber(), ch, opno, 
+							fmchannel[ch].operator[opno].waveSelect);
+					midiDev.send_command(eventSource.Wave2.getNumber(), ch, opno, 
+							fmchannel[ch].operator[opno].waveSelect2);
 					
 				}
 			}

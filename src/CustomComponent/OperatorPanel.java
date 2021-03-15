@@ -12,6 +12,7 @@ import MyEvent.MyDataListener;
 import MyEvent.eventSource;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,7 +31,7 @@ import javafx.scene.paint.Color;
 public class OperatorPanel extends Pane
 {
 
-
+	@FXML Label operatorName;
 	@FXML MySlider slider1;
 	@FXML MySlider slider2;
 	@FXML MySlider slider3;
@@ -38,6 +39,42 @@ public class OperatorPanel extends Pane
 	@FXML MySlider slider5;
 	@FXML MySlider slider6;
 	@FXML MySlider slider7;
+	
+	@FXML MySlider sliderDT;	
+	@FXML MySlider sliderKSL;
+	@FXML MySlider sliderDAM;
+	@FXML MySlider sliderDVB;	
+	
+	@FXML RadioButton eamRadioButton;
+	@FXML RadioButton evbRadioButton;
+	@FXML RadioButton ksrRadioButton;
+	@FXML RadioButton xofRadioButton;	
+	
+	
+	@FXML MySlider sliderMorf;	
+	@FXML RadioButton invert;
+	@FXML RadioButton morph_once;
+
+	@FXML ComboBox<String> waveSelect;
+	@FXML ComboBox<String> waveSelect2;	
+	
+	
+
+
+	@FXML Label valueLabel;
+	@FXML Label valueLabel2;	
+	
+	
+	ObservableList<String> options;
+	ObservableList<String> options2;
+
+	private MyDataListener listener;
+	private MyDataListener listener2;
+
+	private int operatorNo = 0;	
+	
+	
+	
 	
 	String slider1Name = "SLD1";
 	String slider2Name = "SLD2";
@@ -48,33 +85,17 @@ public class OperatorPanel extends Pane
 	String slider7Name = "SLD7";
 	
 
-	@FXML Label operatorName;
-
-	@FXML Label valueLabel;
-	@FXML Label valueLabel2;
 
 
 
-	@FXML RadioButton eamRadioButton;
-	@FXML RadioButton evbRadioButton;
-	@FXML RadioButton ksrRadioButton;
-	@FXML RadioButton xofRadioButton;
 
 
-	@FXML RadioButton invert;
-	@FXML RadioButton morph_once;
-
-	@FXML ComboBox<String> waveSelect;
-	@FXML ComboBox<String> waveSelect2;
 
 
-	ObservableList<String> options;
-	ObservableList<String> options2;
 
-	private MyDataListener listener;
-	private MyDataListener listener2;
 
-	private int operatorNo = 0;
+
+
 
 
     public  OperatorPanel(){
@@ -144,31 +165,33 @@ public class OperatorPanel extends Pane
 
 //		sliderDVB.addEventHandler(MySliderEvent.MYCHANGE_VALUE,
 //				event->	changeValue(event.getEventValue(),eventSource.Dvb)	);
-//		sliderMorf.addEventHandler(MySliderEvent.MYCHANGE_VALUE,
-//				event-> changeValue(event.getEventValue(),eventSource.Morf));
+
+		sliderMorf.addEventHandler(MySliderEvent.MYCHANGE_VALUE,
+				event-> changeValue(event.getEventValue(),eventSource.Morf));
 
 
-		/* 波形選択ComboBoxの初期化 */
-//		options = FXCollections.observableArrayList();
-//		for(int i = 0;i < 8;i++){
-//			String target = ("waveImg/img" + i +".png");
-//			options.add(target);
-//		}
-//		waveSelect.setItems(options);
-//		waveSelect.setCellFactory(c->new StatusListCell());
-//		waveSelect.setButtonCell(new StatusListCell());
-//		waveSelect.setValue(options.get(0));
+		/* a波形選択ComboBoxの初期化 */
+		options = FXCollections.observableArrayList();
+		for(int i = 0;i < 8;i++){
+			String target = ("waveImg/img" + i +".png");
+			options.add(target);
+		}
+		System.out.println(options);
+		waveSelect.setItems(options);
+		waveSelect.setCellFactory(c->new StatusListCell());
+		waveSelect.setButtonCell(new StatusListCell());
+		waveSelect.setValue(options.get(0));
 
 
-//		options2 = FXCollections.observableArrayList();
-//		for(int i = 0;i < 8;i++){
-//			String target2 = ("waveImg/img" + i +".png");
-//			options2.add(target2);
-//		}
-//		waveSelect2.setItems(options2);
-//		waveSelect2.setCellFactory(c->new StatusListCell());
-//		waveSelect2.setButtonCell(new StatusListCell());
-//		waveSelect2.setValue(options2.get(0));
+		options2 = FXCollections.observableArrayList();
+		for(int i = 0;i < 8;i++){
+			String target2 = ("waveImg/img" + i +".png");
+			options2.add(target2);
+		}
+		waveSelect2.setItems(options2);
+		waveSelect2.setCellFactory(c->new StatusListCell());
+		waveSelect2.setButtonCell(new StatusListCell());
+		waveSelect2.setValue(options2.get(0));
 		
 		readOperatorProperties();
 		
@@ -230,21 +253,21 @@ public class OperatorPanel extends Pane
 
 	@FXML
 	void selectedWaveform() {
-//		int i = options.indexOf(    waveSelect.getValue());
-//		changeValue(i, eventSource.Wave);
-//		valueLabel.setText(i+1 + "");
+		int i = options.indexOf(    waveSelect.getValue());
+		changeValue(i, eventSource.Wave);
+		valueLabel.setText(i+1 + "");
 
 	}
 
 	@FXML
 	void selectedWaveform2() {
-//		int i = options2.indexOf(    waveSelect2.getValue());
-//		if(invert.isSelected() == true) {
-//			changeValue(i+8, eventSource.Wave2);
-//		}else {
-//			changeValue(i, eventSource.Wave2);
-//		}
-//		valueLabel2.setText(i+1 + "");
+		int i = options2.indexOf(    waveSelect2.getValue());
+		if(invert.isSelected() == true) {
+			changeValue(i+8, eventSource.Wave2);
+		}else {
+			changeValue(i, eventSource.Wave2);
+		}
+		valueLabel2.setText(i+1 + "");
 
 	}
 
@@ -282,7 +305,7 @@ public class OperatorPanel extends Pane
 	}
 
 	public void setWave( int val){
-//		waveSelect.setValue(options.get(val));
+		waveSelect.setValue(options.get(val));
 	}
 //	public void setDT(Double val){
 //		sliderDT.setValue(val);
@@ -296,18 +319,24 @@ public class OperatorPanel extends Pane
 //		sliderDVB.setValue(val);
 //	}
 	public void setMorphVal(Double val) {
-//		sliderMorf.setValue(val);
+		sliderMorf.setValue(val);
 	}
 
 	public void addListener(MyDataListener listener) {
 		this.listener = listener;
 	}
 
-@FXML	public void change_MorphCycle() {
+	
+	@FXML	public void change_MorphCycle() {
 		
-
-			
+		if(morph_once.isSelected() == true) {
+			changeValue(1,eventSource.MorphOnce);
+		}else {
+			changeValue(0,eventSource.MorphOnce);
+		}
+				
 	}
+
 
 
 }
