@@ -91,7 +91,7 @@
                   <Separator prefHeight="26.0" prefWidth="209.0" />
                   <ComboBox fx:id="toneSelectBox"  prefHeight="26.0" prefWidth="160.0" promptText="User" style="-fx-font-size: 10;" stylesheets="@application.css" />
                   <Separator prefHeight="40.0" prefWidth="178.0" />
-                  <ComboBox fx:id="channelSelectBox"  prefHeight="26.0" prefWidth="86.0" promptText="CH1" style="-fx-font-size: 10;" stylesheets="@application.css" />
+                  <ComboBox fx:id="channelSelectBox"  prefHeight="26.0" prefWidth="86.0" promptText="CH1" style="-fx-font-size: 10;"  onAction="#changeChannel" stylesheets="@application.css" />
                   <Separator prefHeight="36.0" prefWidth="178.0" />
 <!-- 
                   <Button fx:id="changePairButton" mnemonicParsing="false" onAction="#changePareChannel" prefHeight="20.0" prefWidth="124.0" text="Cahnge Pair Tone">
@@ -102,7 +102,7 @@
 -->                     
                      
                   <Separator prefHeight="28.0" prefWidth="178.0" />
-                  <ComboBox fx:id="AlgoSelectBox"  prefHeight="110.0" prefWidth="170.0" />
+                  <ComboBox fx:id="AlgoSelectBox"  prefHeight="110.0" prefWidth="170.0" onAction="#changeAlgo"/>
                   <Separator prefHeight="38.0" prefWidth="178.0" />
                   <Button fx:id="copyToneButton" mnemonicParsing="false"  prefHeight="20.0" prefWidth="140.0" text="Copy to Memory">
                      <font>
@@ -161,12 +161,12 @@
                         <Font size="9.0" />
                      </font></Button>
                   <Separator prefHeight="30.0" prefWidth="178.0" />
-                  <Button fx:id="readFromTextButton" mnemonicParsing="false"  prefHeight="20.0" prefWidth="140.0" text="Read from Text">
+                  <Button fx:id="readFromTextButton" mnemonicParsing="false"  prefHeight="20.0" prefWidth="140.0" text="Read from Text" onAction="#readFromText">
                      <font>
                         <Font size="9.0" />
                      </font></Button>
                   <Separator prefHeight="20.0" prefWidth="178.0" />
-                  <Button fx:id="writeToTextButton" mnemonicParsing="false"  prefHeight="20.0" prefWidth="140.0" text="Write to Text">
+                  <Button fx:id="writeToTextButton" mnemonicParsing="false"  prefHeight="20.0" prefWidth="140.0" text="Write to Text" onAction="#setcopypastDataRow" >
                      <font>
                         <Font size="9.0" />
                      </font></Button>

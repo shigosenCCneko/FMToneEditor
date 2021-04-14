@@ -20,6 +20,7 @@ import javax.sound.midi.Transmitter;
 
 import com.fazecast.jSerialComm.SerialPort;
 
+import DataClass.FMDEVICE;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -29,7 +30,7 @@ import javafx.scene.control.ButtonType;
 public class ConectMidi {
 	
 static int cnt = 0;
-	private final int  YMF825DATLEN = 30;
+//	private final int  YMF825DATLEN = 30;
 
 	private String midiOutDeviceType = "MIDI";
 	
@@ -90,7 +91,7 @@ static int cnt = 0;
 	public void resetDevice(){ //デバイスへリセットコマンドを送信
 
 		wait_millsec(1);
-		//send_command(0,0,0,0);
+		send_command(0,0,0,0);
 		wait_millsec(400);
 		//send_command(99,0,0,0);
 
@@ -106,29 +107,26 @@ static int cnt = 0;
 	}
 	
 
-	public void set_tonedata(int addr,int data){
+	public void aset_tonedata(int addr,int data){
 		int ch;
-	
-		//ch = addr/YMF825DATLEN;
-		//addr = (addr - ch * YMF825DATLEN)/12;
 		ch = 0;
 		send_command(10,ch,addr,data);
 
 }
 	
-	public void writeBurstToneReg(){
-		send_command(9,0,0,0);
-	}	
-	
-	public void write_tonearray(int addr,int data){
-
-		int ch,adr;
-		ch = addr/YMF825DATLEN;
-		adr = addr - ch * YMF825DATLEN;
-
-		send_command(11,ch,adr,data);
-
-	}	
+//	public void writeBurstToneReg(){
+//		send_command(9,0,0,0);
+//	}	
+//	
+//	public void write_tonearray(int addr,int data){
+//
+//		int ch,adr;
+//		ch = addr/YMF825DATLEN;
+//		adr = addr - ch * YMF825DATLEN;
+//
+//		send_command(11,ch,adr,data);
+//
+//	}	
 	
 
 
@@ -162,7 +160,7 @@ static int cnt = 0;
 			e.printStackTrace();
 		}
 
-		for(int i = 0;i < YMF825DATLEN;i++){
+		for(int i = 0;i < FMDEVICE.getInstance().getDatalen();i++){
 			buf[i] = midiExmesBuff[i];
 		}
 
@@ -569,7 +567,7 @@ static int cnt = 0;
 				System.out.println(cnt);
 			}
 			cnt = comInputStream.read(buf);
-			if( 30 == cnt)
+			if( FMDEVICE.getInstance().getDatalen() == cnt)
 				break;
 			}
 

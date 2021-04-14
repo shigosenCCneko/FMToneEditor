@@ -3,12 +3,14 @@ package application;
 import CustomComponent.MySlider;
 import CustomComponent.MySliderEvent;
 import CustomComponent.OperatorPanel;
+import CustomComponent.StatusListCell;
 import DataClass.FMDEVICE;
 import MyEvent.MyDataEvent;
 import MyEvent.MyDataListener;
 import MyEvent.Observer;
 import MyEvent.eventSource;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -17,8 +19,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 
-public class FMToneEditorController implements MyDataListener , Observer{
 
+
+public class FMToneEditorController implements MyDataListener , Observer{
+	private final int MAX_ALG = 14;
 	@FXML OperatorPanel operator1;
 	@FXML OperatorPanel operator2;
 	@FXML OperatorPanel operator3;
@@ -53,11 +57,36 @@ public class FMToneEditorController implements MyDataListener , Observer{
 	@FXML Pane  dummy3;
 	@FXML Pane  dummy4;	
 	@FXML private MenuFieldController menuControll;
+	static FMToneEditorController parent;
+
 	
 	FMDEVICE fmDevice;
-	int currentChannel = 0;
+	static int currentChannel = 0;
 	
 	public void initialize() {
+		fmDevice = FMDEVICE.getInstance();	
+		/* アルゴリズム選択ComboBoxの初期化 */
+		algoOptions = FXCollections.observableArrayList();
+		for(int i = 0;i < MAX_ALG ;i++){
+			String target = ("image/" + i +".png");
+			algoOptions.add(target);
+		}
+		AlgoSelectBox.setItems(algoOptions);
+		AlgoSelectBox.setCellFactory(c->new StatusListCell());
+		AlgoSelectBox.setButtonCell(new StatusListCell());
+		AlgoSelectBox.setValue(algoOptions.get(0));	
+		
+		
+        /* channel Select Box 初期化 */
+		channelOptions = FXCollections.observableArrayList();
+		for(int i = 1;i<= fmDevice.getChannelVal();i++) {
+			String target = ("CH" + i);
+			channelOptions.add(target);
+		}
+		channelSelectBox.setItems(channelOptions);
+		channelSelectBox.setValue("CH1");	
+		
+		
 		operatorArray = new OperatorPanel[4];
 		operatorArray[0] = operator1;
 		operatorArray[1] = operator2;
@@ -81,8 +110,9 @@ public class FMToneEditorController implements MyDataListener , Observer{
 
 */				
 		
-		fmDevice = FMDEVICE.getInstance();
+		FMDEVICE.getInstance().attach(this);
 		setPanel();
+		parent = this;
 		
 	}
 	
@@ -97,25 +127,29 @@ public class FMToneEditorController implements MyDataListener , Observer{
 		// TODO 自動生成されたメソッド・スタブ
 //		System.out.print(source);
 //		System.out.println( opNo + "=" + val);
-		fmDevice.setValue(source, currentChannel, opNo, val);
-
+		
+		if(e == MyDataEvent.DATA_UPDATE) {
+			setPanel();
+		}else {
+			fmDevice.setValue(source, currentChannel, opNo, val);
+		}
 	}
 
 	void setPanel() {
 		fmDevice.notifyStop(true);
 		feedBack1.setValue((double) fmDevice.getValue(currentChannel, 0, eventSource.FeedBK));
-		/*					
+					
 		
-		feedBack2.setValue(
-				(double) toneData.getValue(currentChannel, 2, eventSource.FeedBK2));
-		sliderBO.setValue(
-				(double) toneData.getValue(currentChannel, 0, eventSource.BO));
+//		feedBack2.setValue(
+//				(double) toneData.getValue(currentChannel, 2, eventSource.FeedBK2));
+//		sliderBO.setValue(
+//				(double) toneData.getValue(currentChannel, 0, eventSource.BO));
 
 		AlgoSelectBox.setValue(algoOptions.get(
-				toneData.getValue(currentChannel, 0, eventSource.Connect)));
-		sliderLFO.setValue(
-				(double) toneData.getValue(currentChannel, 0, eventSource.Lfo));
-*/
+				fmDevice.getValue(currentChannel, 0, eventSource.Connect)));
+//		sliderLFO.setValue(
+//				(double) toneData.getValue(currentChannel, 0, eventSource.Lfo));
+
 		for(int opno = 0; opno < fmDevice.getMaxOperator();opno++) {
 			operatorArray[opno].setAtack(
 					(double) fmDevice.getValue(currentChannel, opno, eventSource.SLIDER1));
@@ -141,8 +175,12 @@ public class FMToneEditorController implements MyDataListener , Observer{
 //					1 == (double) toneData.getValue(currentChannel, opno, eventSource.Ksr));
 			operatorArray[opno].setWave(
 					 fmDevice.getValue(currentChannel, opno, eventSource.Wave));
+			operatorArray[opno].setWave2(
+					fmDevice.getValue(currentChannel, opno, eventSource.Wave2));
 			operatorArray[opno].setMorphVal(
 					(double) fmDevice.getValue(currentChannel, opno, eventSource.Morf));
+			operatorArray[opno].setMorphOnce(
+					fmDevice.getValue(currentChannel, opno, eventSource.MorphOnce));
 //			operatorArray[opno].setDT(
 //					(double) toneData.getValue(currentChannel, opno, eventSource.DT));
 //			operatorArray[opno].setDAM(
@@ -150,16 +188,59 @@ public class FMToneEditorController implements MyDataListener , Observer{
 //			operatorArray[opno].setDVB(
 //					(double) toneData.getValue(currentChannel, opno, eventSource.Dvb));
 			
+			
 		}
 		fmDevice.notifyStop(false);		
 		
 		
 	}
 	
+	@FXML void changeChannel() {
+		int i = channelOptions.indexOf(channelSelectBox.getValue());
+		channelSelectBox.setPromptText(channelOptions.get(i));
+		currentChannel = i;
+		setPanel();
+		System.out.println("change channel");
+		fmDevice.setEditChannel(currentChannel);
+	}
 	
+	@FXML private void setcopypastDataRow(){
+		FMDEVICE fmdevice = FMDEVICE.getInstance();
+		byte [] buf = new byte[fmDevice.getDatalen()];
+		StringBuilder st = new StringBuilder();
+		fmdevice.getToneData(currentChannel, buf);
+		int cnt = 1;
+
+		st.append( String.format("%3d,",buf[0]));
+		for(int i = 0;i < fmDevice.getMaxOperator();i++){
+			for(int j = 0;j<fmDevice.getOplen();j++){
+				st.append(String.format("%3d,",(buf[cnt++]&0x00ff)));
+			}
+		}
+		toneDataText.setText(new String(st));
+		System.out.println("text out");
+	}
 	
-	
-	
+	@FXML void readFromText() {
+		/* テキストフィールドからカレントチャンネルへ音色データを読み込む　*/
+
+			byte [] buf = new byte[fmDevice.getDatalen()];
+			String s;
+			String str = toneDataText.getText();
+			String[] token = str.split(",",0);
+			int cnt = token.length;
+			int data,k,l;
+			if(cnt == fmDevice.getDatalen()) {
+				for(int i =0;i < cnt;i++){
+					s = token[i].trim();
+					buf[i] =(byte) (0x00ff & Integer.parseInt(s));
+				}
+				FMDEVICE fmdevice = FMDEVICE.getInstance();
+				fmdevice.setTone(currentChannel, buf);
+				
+			}
+			setPanel();
+	}
 	
 	public void update(EventType<MyDataEvent> e, eventSource source, int ch,int op, int val) {
 		if(e == MyEvent.MyDataEvent.DATA_UPDATE) {
@@ -173,6 +254,17 @@ public class FMToneEditorController implements MyDataListener , Observer{
 		  System.exit(0);
 		  System.out.println("env exit");
 	  }
+	  
+	@FXML void changeAlgo() {
+			int i = algoOptions.indexOf(AlgoSelectBox.getValue());
+			
+//System.out.println("change algorithm");
+			changeValue(null,eventSource.Connect,0,i);
+	
+
+
+	}
+	
 
 	
 }

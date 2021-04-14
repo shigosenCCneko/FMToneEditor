@@ -39,43 +39,43 @@ public class OperatorPanel extends Pane
 	@FXML MySlider slider5;
 	@FXML MySlider slider6;
 	@FXML MySlider slider7;
-	
-	@FXML MySlider sliderDT;	
+
+	@FXML MySlider sliderDT;
 	@FXML MySlider sliderKSL;
 	@FXML MySlider sliderDAM;
-	@FXML MySlider sliderDVB;	
-	
+	@FXML MySlider sliderDVB;
+
 	@FXML RadioButton eamRadioButton;
 	@FXML RadioButton evbRadioButton;
 	@FXML RadioButton ksrRadioButton;
-	@FXML RadioButton xofRadioButton;	
-	
-	
-	@FXML MySlider sliderMorf;	
+	@FXML RadioButton xofRadioButton;
+
+
+	@FXML MySlider sliderMorf;
 	@FXML RadioButton invert;
 	@FXML RadioButton morph_once;
 
 	@FXML ComboBox<String> waveSelect;
-	@FXML ComboBox<String> waveSelect2;	
-	
-	
+	@FXML ComboBox<String> waveSelect2;
+
+
 
 
 	@FXML Label valueLabel;
-	@FXML Label valueLabel2;	
-	
-	
+	@FXML Label valueLabel2;
+
+
 	ObservableList<String> options;
 	ObservableList<String> options2;
 
 	private MyDataListener listener;
 	private MyDataListener listener2;
 
-	private int operatorNo = 0;	
-	
-	
-	
-	
+	private int operatorNo = 0;
+
+
+
+
 	String slider1Name = "SLD1";
 	String slider2Name = "SLD2";
 	String slider3Name = "SLD3";
@@ -83,7 +83,7 @@ public class OperatorPanel extends Pane
 	String slider5Name = "SLD5";
 	String slider6Name = "SLD6";
 	String slider7Name = "SLD7";
-	
+
 
 
 
@@ -192,10 +192,10 @@ public class OperatorPanel extends Pane
 		waveSelect2.setCellFactory(c->new StatusListCell());
 		waveSelect2.setButtonCell(new StatusListCell());
 		waveSelect2.setValue(options2.get(0));
-		
+
 		readOperatorProperties();
-		
-		
+
+
 	}
 
 	private void readOperatorProperties(){
@@ -205,19 +205,19 @@ public class OperatorPanel extends Pane
 			InputStream istream = new FileInputStream("fmToneEditorOperator.properties");
 			properties.load(istream);
 			slider1Name = properties.getProperty("slider1Name");
-			
+
 			slider2Name = properties.getProperty("slider2Name");
-			
+
 			slider3Name = properties.getProperty("slider3Name");
-			
+
 			slider4Name = properties.getProperty("slider4Name");
-			
+
 			slider5Name = properties.getProperty("slider5Name");
-			
+
 			slider6Name = properties.getProperty("slider6Name");
-			
+
 			slider7Name = properties.getProperty("slider7Name");
-			
+
 
 			slider1.setLabelName(slider1Name);
 			slider2.setLabelName(slider2Name);
@@ -226,7 +226,7 @@ public class OperatorPanel extends Pane
 			slider5.setLabelName(slider5Name);
 			slider6.setLabelName(slider6Name);
 			slider7.setLabelName(slider7Name);
-			
+
 			slider1.setMax(Double.parseDouble(properties.getProperty("slider1Max")));
 			slider2.setMax(Double.parseDouble(properties.getProperty("slider2Max")));
 			slider3.setMax(Double.parseDouble(properties.getProperty("slider3Max")));
@@ -234,19 +234,31 @@ public class OperatorPanel extends Pane
 			slider5.setMax(Double.parseDouble(properties.getProperty("slider5Max")));
 			slider6.setMax(Double.parseDouble(properties.getProperty("slider6Max")));
 			slider7.setMax(Double.parseDouble(properties.getProperty("slider7Max")));
-			
-			
+
+
 
 			istream.close();
-			
+
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		
+
 	}
 
 
+	@FXML
+	void invert_Waveform2() {
+		
+		int i = options2.indexOf(    waveSelect2.getValue());
+		if(invert.isSelected() == true) {
+			changeValue(i+8, eventSource.Wave2);
+		}else {
+			changeValue(i, eventSource.Wave2);
+		}
 
+		
+
+	}
 
 
 
@@ -307,6 +319,16 @@ public class OperatorPanel extends Pane
 	public void setWave( int val){
 		waveSelect.setValue(options.get(val));
 	}
+	
+	public void setWave2(int val) {
+		if(val > 7) {
+			val = val - 8;
+			invert.setSelected(true);
+		}else {
+			invert.setSelected(false);
+		}
+		waveSelect2.setValue(options2.get(val));
+	}
 //	public void setDT(Double val){
 //		sliderDT.setValue(val);
 //	}
@@ -321,20 +343,34 @@ public class OperatorPanel extends Pane
 	public void setMorphVal(Double val) {
 		sliderMorf.setValue(val);
 	}
+	public void setMorphOnce(int val) {
+		if(val == 0) {
+			morph_once.setSelected(false);
+		}else {
+			morph_once.setSelected(true);
+		}
+	}
+	public void invertMorph(int val) {
+		if(val == 0) {
+			invert.setSelected(false);
+		}else {
+			invert.setSelected(true);
+		}
+	}
 
 	public void addListener(MyDataListener listener) {
 		this.listener = listener;
 	}
 
-	
+
 	@FXML	public void change_MorphCycle() {
-		
+
 		if(morph_once.isSelected() == true) {
 			changeValue(1,eventSource.MorphOnce);
 		}else {
 			changeValue(0,eventSource.MorphOnce);
 		}
-				
+
 	}
 
 

@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 /*
  *  Custom Slider with NameLabel and ValueLabel
@@ -48,6 +49,28 @@ public class MySlider extends VBox  {
     		Number new_val) ->{
     			sliderChangeValue(new_val.intValue());
     	}); 	  
+        slider.setOnScroll((ScrollEvent event) ->{
+        	double deltaY = event.getDeltaY();
+        	double multiY = event.getMultiplierY();
+
+        	double cnt = (int)(deltaY/multiY);
+    
+        	double max = slider.getMax();
+        	double val = slider.getValue();
+        	
+        	val = val + cnt;
+        	if(val >=0 && val <= max) {
+        		if(slider.isFocused()== true) {
+        		slider.setValue(val);
+        		}
+        	}
+        	
+        	
+        });
+       
+        
+        
+        
         
         
     }

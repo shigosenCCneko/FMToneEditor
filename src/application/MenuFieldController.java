@@ -54,7 +54,7 @@ public class MenuFieldController {
 	SoftwareModulationController softModuControll;
 	String workDir;
 	
-	FMDEVICE toneData;
+	FMDEVICE fmDevice;
 	
 
 public MenuFieldController() throws IOException{
@@ -75,10 +75,8 @@ public MenuFieldController() throws IOException{
 }
 
 	public void initialize() {
-		toneData = FMDEVICE.getInstance();
-		//toneData.addListener(this);
-
-
+		fmDevice = FMDEVICE.getInstance();
+		//fmDevice.addListener(this);
 
 		Properties properties = new Properties();
 
@@ -118,13 +116,12 @@ public MenuFieldController() throws IOException{
 			try {
 				FileInputStream fis = new FileInputStream(file);
 				BufferedInputStream bis = new BufferedInputStream(fis);
-				byte rbuf[] = new byte[480];
+				byte rbuf[] = new byte[fmDevice.getTonesetLen()];
 				int len = bis.read(rbuf);
+				if(len == fmDevice.getTonesetLen()) {
+					fmDevice.setToneSet(rbuf);
+				}
 
-//				if(len == 480){
-//					STM32FM aaa = STM32FM.getInstance();
-//					aaa.setToneSet(rbuf);
-//				}
 				bis.close();
 
 			} catch (IOException e) {
@@ -135,15 +132,13 @@ public MenuFieldController() throws IOException{
 	}
 
 	@FXML void saveToneSet() {
-		byte wbuf[] = new byte[480];
-//		STM32FM ymf825 = STM32FM.getInstance();
+		//System.out.println("write tone set");
+		byte wbuf[] = new byte[fmDevice.getTonesetLen()];
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Tone Set");
 		fileChooser.getExtensionFilters().addAll(
 		        new FileChooser.ExtensionFilter("SDS", "*.sds"));
-
-
 
 		File dir = new File(workDir);
 		if(dir.exists() == false) {
@@ -153,11 +148,8 @@ public MenuFieldController() throws IOException{
 		File file = fileChooser.showSaveDialog(null);
 
 		if(file != null) {
-//			byte buf[] = ymf825.getToneDataSet();
-//			byte wbuf= new byte [480];
-//			for(int i = 0;i < 480;i++){
-//				wbuf[i] = (byte)(buf[i] & 0xff);
-//			}
+			fmDevice.getToneSet(wbuf);
+
 			try{
 
 				FileOutputStream fos = new FileOutputStream(file);
@@ -227,13 +219,11 @@ public MenuFieldController() throws IOException{
 			try {
 				FileInputStream fis = new FileInputStream(file);
 				BufferedInputStream bis = new BufferedInputStream(fis);
-				byte rbuf[] = new byte[30];
+				byte rbuf[] = new byte[fmDevice.getDatalen()];
 				int len = bis.read(rbuf);
 
-				if(len == 30){
-					//STM32FM aaa = STM32FM.getInstance();
-					//aaa.setTone(PanelController.getPanelChannel(), rbuf);
-
+				if(len == fmDevice.getDatalen()){
+					fmDevice.setTone(fmDevice.getEditChannel(), rbuf);
 
 				}
 				bis.close();
@@ -244,7 +234,6 @@ public MenuFieldController() throws IOException{
 		}
 	}
 	@FXML void saveTone() {
-		//STM32FM stm32 = STM32FM.getInstance();
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Tone");
@@ -260,12 +249,8 @@ public MenuFieldController() throws IOException{
 
 		if(file != null) {
 			
-			byte buf[] = new byte[30];
-			//stm32.getToneData(PanelController.getPanelChannel(),buf);
-			byte wbuf[]= new byte [30];
-			for(int i = 0;i < 30;i++){
-				wbuf[i] = (byte)(buf[i] & 0xff);
-			}
+			byte wbuf[] = new byte[fmDevice.getDatalen()];
+			fmDevice.getToneData(fmDevice.getEditChannel(), wbuf);
 			try{
 
 				FileOutputStream fos = new FileOutputStream(file);
@@ -290,56 +275,47 @@ public MenuFieldController() throws IOException{
 
 	}
 
-	private void copyOp(int source,int target,byte buf[]){
-		int from = 2+source*7;
-		int to = 2 + target* 7;
-		for(int i = 0;i < 7;i++){
-			buf[to+i] = buf[from+i];
-		}
+	private void copyOp(int source,int target){
+		byte buf[] = new byte[fmDevice.getOplen()];
+		int ch = fmDevice.getEditChannel();
+		fmDevice.getOperator(ch, source, buf);
+		fmDevice.setOperator(ch, target, buf);
 
 	}
-	private void clearOp(int opno,byte buf[]){
-		byte source[] = { 2, 80, -16, -4, 0, 16, 3};
-		int to = 2+opno*7;
-		for(int i = 0;i<7;i++){
-			buf[to+i] = source[i];
-		}
+	private void clearOp(int opno){
+		byte source[] = { -1, 0, 0, 0, 0, 0, 0,0,0,0,0,0};
+		int ch = fmDevice.getEditChannel();
+		fmDevice.setOperator(ch, opno, source);
+		
 	}
 
 
 
 	@FXML void copy12to34() {
-//		byte buf[] = new byte[30];
-//		toneData.getToneData(PanelController.getPanelChannel(),buf);
-//		copyOp(0,2,buf);
-//		copyOp(1,3,buf);
-//		toneData.setTone(PanelController.getPanelChannel(),buf);
+		copyOp(0,2);
+		copyOp(1,3);
+		//toneData.setTone(PanelController.getPanelChannel(),buf);
 	}
 	@FXML void copy12to34Clear() {
-//		byte buf[] = new byte[30];
-//		toneData.getToneData(PanelController.getPanelChannel(),buf);
-//		copyOp(0,2,buf);
-//		copyOp(1,3,buf);
-//		clearOp(0,buf);
-//		clearOp(1,buf);
+
+		copyOp(0,2);
+		copyOp(1,3);
+		clearOp(0);
+		clearOp(1);
 //		toneData.setTone(PanelController.getPanelChannel(),buf);
 	}
 	@FXML void copy12to23() {
-//		byte buf[] = new byte[30];
-//		toneData.getToneData(PanelController.getPanelChannel(),buf);
-//		copyOp(1,2,buf);
-//		copyOp(0,1,buf);
-//		clearOp(0,buf);
-//		clearOp(3,buf);
+		copyOp(1,2);
+		copyOp(0,1);
+		clearOp(0);
+		clearOp(3);
 //		toneData.setTone(PanelController.getPanelChannel(),buf);
 
 	}
 	@FXML void copy1to234() {
-//		byte buf[] = new byte[30];
-//		toneData.getToneData(PanelController.getPanelChannel(),buf);
-//		copyOp(0,1,buf);
-//		copyOp(0,2,buf);
-//		copyOp(0,3,buf);
+		copyOp(0,1);
+		copyOp(0,2);
+		copyOp(0,3);
 //		toneData.setTone(PanelController.getPanelChannel(),buf);
 	}
 	@FXML void viewSoftwareModulation() {

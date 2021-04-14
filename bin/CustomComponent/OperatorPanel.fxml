@@ -28,7 +28,7 @@
       <ComboBox fx:id="waveSelect" layoutX="65.0" layoutY="222.0" onAction="#selectedWaveform" prefHeight="20.0" prefWidth="65.0" />
       <ComboBox fx:id="waveSelect2" layoutX="65.0" layoutY="278.0" onAction="#selectedWaveform2" prefHeight="20.0" prefWidth="65.0" />
 
-  		 <RadioButton fx:id="invert" layoutX="69.0" layoutY="257.0" mnemonicParsing="false" text="invert" />
+  		 <RadioButton fx:id="invert" layoutX="69.0" layoutY="257.0" mnemonicParsing="false" onAction="#invert_Waveform2" text="invert" />
          <Label fx:id="valueLabel" layoutX="147.0" layoutY="226.0" prefHeight="17.0" prefWidth="21.0" text="0" />
       	 <Label fx:id="valueLabel2" layoutX="147.0" layoutY="282.0" prefHeight="17.0" prefWidth="21.0" text="0" />
       <RadioButton fx:id="morph_once" layoutX="79.0" layoutY="334.0" mnemonicParsing="false" onAction="#change_MorphCycle" text="Morph at once" />
