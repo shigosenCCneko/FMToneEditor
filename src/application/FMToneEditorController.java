@@ -65,6 +65,8 @@ public class FMToneEditorController implements MyDataListener , Observer{
 	
 	public void initialize() {
 		fmDevice = FMDEVICE.getInstance();	
+		FMDEVICE.getInstance().attach(this);
+
 		/* アルゴリズム選択ComboBoxの初期化 */
 		algoOptions = FXCollections.observableArrayList();
 		for(int i = 0;i < MAX_ALG ;i++){
@@ -110,9 +112,10 @@ public class FMToneEditorController implements MyDataListener , Observer{
 
 */				
 		
-		FMDEVICE.getInstance().attach(this);
+
 		setPanel();
 		parent = this;
+		fmDevice.toneDataInit();
 		
 	}
 	
@@ -200,7 +203,6 @@ public class FMToneEditorController implements MyDataListener , Observer{
 		channelSelectBox.setPromptText(channelOptions.get(i));
 		currentChannel = i;
 		setPanel();
-		System.out.println("change channel");
 		fmDevice.setEditChannel(currentChannel);
 	}
 	

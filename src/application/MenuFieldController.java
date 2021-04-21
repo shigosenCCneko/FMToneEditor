@@ -116,9 +116,10 @@ public MenuFieldController() throws IOException{
 			try {
 				FileInputStream fis = new FileInputStream(file);
 				BufferedInputStream bis = new BufferedInputStream(fis);
-				byte rbuf[] = new byte[fmDevice.getTonesetLen()];
+				byte rbuf[] = new byte[fmDevice.getTonesetLen()+ 
+				                fmDevice.getWavedataLen() * fmDevice.getUserWaveVal()];
 				int len = bis.read(rbuf);
-				if(len == fmDevice.getTonesetLen()) {
+				if(len == fmDevice.getTonesetLen()||len == (fmDevice.getTonesetLen() + 256 * 4)) {
 					fmDevice.setToneSet(rbuf);
 				}
 
@@ -146,15 +147,26 @@ public MenuFieldController() throws IOException{
 		}
 		fileChooser.setInitialDirectory(dir);
 		File file = fileChooser.showSaveDialog(null);
-
+		byte sbuf[] = new byte[fmDevice.getUserWaveVal() * fmDevice.getWavedataLen()];
+		double sdata[][] = fmDevice.WaveData();
+		int cnt = 0;
 		if(file != null) {
 			fmDevice.getToneSet(wbuf);
-
+			for(int i = 0; i < fmDevice.getUserWaveVal();i++) {
+				for(int j = 0; j < fmDevice.getWavedataLen();j++) {
+					sbuf[cnt++] = (byte) sdata[i][j];
+					
+				}
+			}
+	
 			try{
 
 				FileOutputStream fos = new FileOutputStream(file);
 				BufferedOutputStream bos = new BufferedOutputStream(fos);
 				bos.write(wbuf);
+				bos.flush();
+				bos.write(sbuf);
+			
 				bos.flush();
 				bos.close();
 			}catch(IOException err){

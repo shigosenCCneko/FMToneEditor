@@ -5,7 +5,7 @@ public enum  eventSource {
 	FeedBK(7),Wave(8),Morf(9),Wave2(10),MorphOnce(11),
 	Ksl(12),Ksr(13),
 	FeedBK2(14),BO(15),Connect(16),DT(17),Lfo(18),Dam(19),Dvb(20),
-	EAM(21),EVB(22),XOF(23),XVB(24),ToneChange(25),Invert(26);
+	EAM(21),EVB(22),XOF(23),XVB(24),ToneChange(25),Invert(26),UserwaveLoad(27);
 	
 	private final int number;
 	

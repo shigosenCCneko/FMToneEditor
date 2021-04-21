@@ -20,7 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Window;
 
 public class SoftwareModulationController implements Observer {
-	FMDEVICE toneData;
+	FMDEVICE fmDevice;
 
 
 	GraphicsContext wg1,wg2,wg3,wg4;
@@ -32,7 +32,7 @@ public class SoftwareModulationController implements Observer {
 
 
 	final int WAVE_MAX = 127;
-	int operator = 0;
+	int userwaveNo = 0;
 	int wave_sin[] = 	{
 			  0,  3,  6,  9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45,
 			  48, 51, 54, 57, 59, 62, 65, 67, 70, 73, 75, 78, 80, 82, 85, 87,
@@ -227,8 +227,8 @@ public class SoftwareModulationController implements Observer {
 		canvas[3] = canvas4;
 
 		
-		toneData = FMDEVICE.getInstance();
-		toneData.attach(this);
+		fmDevice = FMDEVICE.getInstance();
+		fmDevice.attach(this);
 		
 		wg1 = canvas1.getGraphicsContext2D();
 		wg2 = canvas2.getGraphicsContext2D();
@@ -253,8 +253,8 @@ public class SoftwareModulationController implements Observer {
 			
 		for(int j = 0;j < 4;j++) {
 			for(int i = 0 ; i < 255;i++) {
-				(toneData.WaveData())[j][i] = (double)wave_sin[i];
-				toneData.send_user_wave(j   ,i, (int)(toneData.WaveData())[j][i]);
+				(fmDevice.WaveData())[j][i] = (double)wave_sin[i];
+				fmDevice.send_user_wave(j   ,i, (int)(fmDevice.WaveData())[j][i]);
 			}
 		}
 		for(int i = 0; i < 4;i++) {
@@ -279,15 +279,15 @@ public class SoftwareModulationController implements Observer {
 			preX = x ;
 			preY = y;
 
-			int val = (int)(toneData.WaveData())[j][x]+WAVE_MAX;
+			int val = (int)(fmDevice.WaveData())[j][x]+WAVE_MAX;
 
 			if(val != y) {
 				wg[j].clearRect(x*scaleX, val*scaleY, scaleX, scaleY);
 			}
 			wg[j].fillRect(x*scaleX,y*scaleY,scaleX,scaleY);
 			y = y - WAVE_MAX;
-			(toneData.WaveData())[j][x] = y;
-			toneData.send_user_wave(j, x, y);
+			(fmDevice.WaveData())[j][x] = y;
+			fmDevice.send_user_wave(j, x, y);
 			//toneData.send_user_wave(1, x, y);
 		});
 
@@ -306,15 +306,15 @@ public class SoftwareModulationController implements Observer {
 				wg[j].clearRect(preX*scaleX,preY*scaleY,scaleX, scaleY);
 
 			}else {
-				wg[j].clearRect(x*scaleX, ((toneData.WaveData())[j][x]+WAVE_MAX)*scaleY, scaleX,scaleY);
+				wg[j].clearRect(x*scaleX, ((fmDevice.WaveData())[j][x]+WAVE_MAX)*scaleY, scaleX,scaleY);
 			}
 
 			wg[j].fillRect(x*scaleX,y*scaleY,scaleX,scaleY);
 			preX = x;
 			preY = y;
 			y = y - WAVE_MAX;
-			(toneData.WaveData())[j][x] = y;
-			toneData.send_user_wave(j,x, y);
+			(fmDevice.WaveData())[j][x] = y;
+			fmDevice.send_user_wave(j,x, y);
 
 			wg[j].strokeLine(0, ofsY*scaleY, 256*scaleX, ofsY*scaleY);
 		});
@@ -355,28 +355,28 @@ public class SoftwareModulationController implements Observer {
 	private void drawLine(){
 		int x,y;
 		//Color col = Color.DARKGRAY;
-		for(int i = 0; i < 4;i++) {
+		for(int i = 0; i < fmDevice.getUserWaveVal();i++) {
 			wg[i].clearRect(0, 0, 256*scaleX, 256*scaleY);	
 		}
 
 
-		for(int j = 0;j < 4;j++) {
-			for(int i = 0 ; i < 256;i++) {
+		for(int j = 0;j < fmDevice.getUserWaveVal();j++) {
+			for(int i = 0 ; i < fmDevice.getWavedataLen();i++) {
 				x = i;
-				y = (int)(toneData.WaveData())[j][i]+(int)ofsY;
+				y = (int)(fmDevice.WaveData())[j][i]+(int)ofsY;
 				wg[j].fillRect(x*scaleX,y*scaleY,scaleX,scaleY);
 			}
 			
 		}
-		for(int j = 0; j < 4;j++) {
-			for(int i = 0 ; i < 256;i++) {
+		for(int j = 0; j < fmDevice.getUserWaveVal();j++) {
+			for(int i = 0 ; i < fmDevice.getWavedataLen();i++) {
 				x = i;
-				y = (int)(toneData.WaveData())[j][i]+(int)ofsY;
+				y = (int)(fmDevice.WaveData())[j][i]+(int)ofsY;
 				wg[j].fillRect(x*scaleX,y*scaleY,scaleX,scaleY);
 
 			}
 		}
-		for(int j = 0;j < 4;j++) {
+		for(int j = 0;j < fmDevice.getUserWaveVal();j++) {
 		wg[j].strokeLine(0, ofsY*scaleY, 256*scaleX, ofsY*scaleY);
 		}
 	}
@@ -384,6 +384,9 @@ public class SoftwareModulationController implements Observer {
 	@Override
 	public void update(EventType<MyDataEvent> e, eventSource source, int ch, int op, int val) {
 		// TODO 自動生成されたメソッド・スタブ
+		if(source == eventSource.UserwaveLoad) {
+			drawLine();
+		}
 
 	}
 //	private void 	set_wave(int source[]){
@@ -394,23 +397,24 @@ public class SoftwareModulationController implements Observer {
 //		drawLine();
 //	}
 	@FXML void wave_clear() {
-		wg[operator].clearRect(0, 0, 300, 300);
+		wg[userwaveNo].clearRect(0, 0, 300, 300);
 
 
 
-		for(int i = 0;i < 256;i++) {
+		for(int i = 0;i < fmDevice.getWavedataLen();i++) {
 
-				(toneData.WaveData())[operator][i] = 0;
-				toneData.send_user_wave(operator,i, (int)(toneData.WaveData())[operator][i]);
+				(fmDevice.WaveData())[userwaveNo][i] = 0;
+				fmDevice.send_user_wave(userwaveNo,i, (int)(fmDevice.WaveData())[userwaveNo][i]);
 
 		}
-		wg[operator].strokeLine(0, ofsY*scaleY, 256*scaleX, ofsY*scaleY);
+		wg[userwaveNo].strokeLine(0, ofsY*scaleY, 256*scaleX, ofsY*scaleY);
 
 	}
-	void set_wave(int[] wave) {
-		wg[operator].clearRect(operator, 0, 300, 300);
 
-		for(int i = 0;i < 256;i++) {
+	void set_wave(int[] wave) {
+		wg[userwaveNo].clearRect(userwaveNo, 0, 300, 300);
+
+		for(int i = 0;i < fmDevice.getWavedataLen();i++) {
 			double d;
 			d = wave[i];
 			if(quarterSel.isSelected() == true) {
@@ -422,12 +426,12 @@ public class SoftwareModulationController implements Observer {
 			}
 			
 	
-			(toneData.WaveData())[operator][i] += d;
-			toneData.send_user_wave(operator,i, (int)(toneData.WaveData())[operator][i]);
-			wg[operator].fillRect(i*scaleX,((int)(toneData.WaveData())[operator][i]+ofsY)*scaleY,scaleX,scaleY);
+			(fmDevice.WaveData())[userwaveNo][i] += d;
+			fmDevice.send_user_wave(userwaveNo,i, (int)(fmDevice.WaveData())[userwaveNo][i]);
+			wg[userwaveNo].fillRect(i*scaleX,((int)(fmDevice.WaveData())[userwaveNo][i]+ofsY)*scaleY,scaleX,scaleY);
 
 		}
-		wg[operator].strokeLine(0, ofsY*scaleY, 256*scaleX, ofsY*scaleY);
+		wg[userwaveNo].strokeLine(0, ofsY*scaleY, 256*scaleX, ofsY*scaleY);
 		
 	}
 
@@ -474,8 +478,8 @@ public class SoftwareModulationController implements Observer {
 
 
 
-		for(int i = 0;i < 256;i ++) {
-				buf.append(String.format("%3d,", (int)(toneData.WaveData())[operator][i]));
+		for(int i = 0;i < fmDevice.getWavedataLen();i ++) {
+				buf.append(String.format("%3d,", (int)(fmDevice.WaveData())[userwaveNo][i]));
 		}
 		waveText.setText(new String(buf));
 		//System.out.println(buf);
@@ -483,7 +487,7 @@ public class SoftwareModulationController implements Observer {
 
 
 	@FXML void read_data() {
-		wg[operator].clearRect(0, 0, 300, 300);
+		wg[userwaveNo].clearRect(0, 0, 300, 300);
 		String str = waveText.getText().replaceAll("\n| |\\(|\\)", "");
 		String buf[] = str.split(",");
 
@@ -503,30 +507,30 @@ public class SoftwareModulationController implements Observer {
 //		midiDev.send_command(1,0,4,Integer.parseInt(buf[4]));
 
 
-		if( buf.length == 256) {
+		if( buf.length == fmDevice.getWavedataLen()) {
 
-			for(int i = 0;i<256;i++) {
+			for(int i = 0;i<fmDevice.getWavedataLen();i++) {
 				//System.out.println(Integer.parseInt(buf[i]));
-				(toneData.WaveData())[operator][i] = Integer.parseInt(buf[i]);
-				toneData.send_user_wave(operator,i, (int)(toneData.WaveData())[operator][i]);
+				(fmDevice.WaveData())[userwaveNo][i] = Integer.parseInt(buf[i]);
+				fmDevice.send_user_wave(userwaveNo,i, (int)(fmDevice.WaveData())[userwaveNo][i]);
 			}
 			drawLine();
 		}
 	}
 
 @FXML	void selectOperator1(){
-		operator = 0;
+		userwaveNo = 0;
 	}
 @FXML	void selectOperator1_2() {
-		operator = 2;
+		userwaveNo = 2;
 }
 
 @FXML	void selectOperator2() {
-		operator = 1;
+		userwaveNo = 1;
 	}
 
 @FXML	void selectOperator2_2() {
-		operator = 3;
+		userwaveNo = 3;
 }
 
 

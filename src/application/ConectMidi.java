@@ -107,12 +107,12 @@ static int cnt = 0;
 	}
 	
 
-	public void aset_tonedata(int addr,int data){
-		int ch;
-		ch = 0;
-		send_command(10,ch,addr,data);
-
-}
+//	public void aset_tonedata(int addr,int data){
+//		int ch;
+//		ch = 0;
+//		send_command(10,ch,addr,data);
+//
+//}
 	
 //	public void writeBurstToneReg(){
 //		send_command(9,0,0,0);

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import DataClass.FMDEVICE;
 import MyEvent.MyDataEvent;
 import MyEvent.MyDataListener;
 import MyEvent.eventSource;
@@ -172,7 +173,7 @@ public class OperatorPanel extends Pane
 
 		/* a波形選択ComboBoxの初期化 */
 		options = FXCollections.observableArrayList();
-		for(int i = 0;i < 8;i++){
+		for(int i = 0;i < FMDEVICE.getInstance().getMaxWaveform();i++){
 			String target = ("waveImg/img" + i +".png");
 			options.add(target);
 		}
@@ -184,7 +185,7 @@ public class OperatorPanel extends Pane
 
 
 		options2 = FXCollections.observableArrayList();
-		for(int i = 0;i < 8;i++){
+		for(int i = 0;i < FMDEVICE.getInstance().getMaxWaveform();i++){
 			String target2 = ("waveImg/img" + i +".png");
 			options2.add(target2);
 		}
@@ -251,7 +252,7 @@ public class OperatorPanel extends Pane
 		
 		int i = options2.indexOf(    waveSelect2.getValue());
 		if(invert.isSelected() == true) {
-			changeValue(i+8, eventSource.Wave2);
+			changeValue(i+16, eventSource.Wave2);
 		}else {
 			changeValue(i, eventSource.Wave2);
 		}
@@ -266,7 +267,11 @@ public class OperatorPanel extends Pane
 	@FXML
 	void selectedWaveform() {
 		int i = options.indexOf(    waveSelect.getValue());
-		changeValue(i, eventSource.Wave);
+		if(invert.isSelected()== true) {
+			changeValue(i+16, eventSource.Wave);
+		}else {
+			changeValue(i, eventSource.Wave);
+		}
 		valueLabel.setText(i+1 + "");
 
 	}
@@ -275,7 +280,7 @@ public class OperatorPanel extends Pane
 	void selectedWaveform2() {
 		int i = options2.indexOf(    waveSelect2.getValue());
 		if(invert.isSelected() == true) {
-			changeValue(i+8, eventSource.Wave2);
+			changeValue(i+16, eventSource.Wave2);
 		}else {
 			changeValue(i, eventSource.Wave2);
 		}
@@ -317,12 +322,16 @@ public class OperatorPanel extends Pane
 	}
 
 	public void setWave( int val){
+		if(val > 15) {
+			val = val - 16;
+		}
+		
 		waveSelect.setValue(options.get(val));
 	}
 	
 	public void setWave2(int val) {
-		if(val > 7) {
-			val = val - 8;
+		if(val > 15) {
+			val = val - 16;
 			invert.setSelected(true);
 		}else {
 			invert.setSelected(false);

@@ -4,7 +4,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import MyEvent.MyDataEvent;
-import MyEvent.MyDataListener;
 import MyEvent.Observer;
 import MyEvent.eventSource;
 import application.ConectMidi;
@@ -21,6 +20,11 @@ static	final int OPERATOR_LEN = 12;
 static  final int  DATA_LEN = OPERATOR_LEN * MAX_OPERATOR + 1;
 static final int CHANNEL_VAL = 5;
 static  final int  TONESET_LEN = DATA_LEN * CHANNEL_VAL;
+
+static final int MAX_WAVE_FORM = 11;
+
+static final int WAVEDATA_LEN = 256;
+static final int USERWAVE_VAL = 4;
 
 
 
@@ -77,10 +81,10 @@ class FMCHANNEL{
 
 	private FMCHANNEL[] fmchannel = new FMCHANNEL[16];
 
-    double userWaveData[][] = new double[4][256];
+    double userWaveData[][] = new double[USERWAVE_VAL][WAVEDATA_LEN];
 
-	private byte toneData[] = new byte[TONESET_LEN];
-	private MyDataListener listener;
+//	private byte toneData[] = new byte[TONESET_LEN];
+//	private MyDataListener listener;
 	
 	private ConectMidi midiDev;
 	private int editChannelNo = 0;
@@ -91,7 +95,7 @@ class FMCHANNEL{
 	Vector<Observer> observers;
 	
 	private FMDEVICE() {
-		MyDataListener listener;
+		//MyDataListener listener;
 		fmchannel = new FMCHANNEL[CHANNEL_VAL];
 		for(int i = 0;i < CHANNEL_VAL;i++) {
 			fmchannel[i] = new FMCHANNEL();
@@ -103,7 +107,7 @@ class FMCHANNEL{
 		
 		
 		midiDev= new ConectMidi();
-		toneDataInit();
+		//toneDataInit();
 		observers = null;
 
 	}
@@ -120,7 +124,7 @@ class FMCHANNEL{
 		return FmToneDataInstanceHolder.INSTANCE;
 	}
 
-
+	
 /* 変更通知 */
 	public void attach(Observer o) {
 		if(observers == null) {
@@ -144,10 +148,6 @@ class FMCHANNEL{
 	}
 
 
-	public void get_tonememory(int ch,byte[] buf){
-		//midiDev.get_tonememory(ch, buf);
-	}
-
 
 	public int getAlgorithmNo(int ch){
 		int i;
@@ -157,26 +157,21 @@ class FMCHANNEL{
 	}
 
 
-	public  byte[] getToneDataSet() {
-		return toneData;
-
-	}
-
-	public   void getOperator(int no, int op ,byte buf[]) {
+	public   void getOperator(int ch, int op ,byte buf[]) {
 		int i = 0;
-		buf[i++] = (byte) fmchannel[no].operator[op].feedback;
-		buf[i++] = (byte) fmchannel[no].operator[op].attack;
-		buf[i++] = (byte) fmchannel[no].operator[op].decey;
-		buf[i++] = (byte) fmchannel[no].operator[op].sustain;
-		buf[i++] = (byte) fmchannel[no].operator[op].sustainLevel;
-		buf[i++] = (byte) fmchannel[no].operator[op].release;
-		buf[i++] = (byte) fmchannel[no].operator[op].multiple;
+		buf[i++] = (byte) fmchannel[ch].operator[op].feedback;
+		buf[i++] = (byte) fmchannel[ch].operator[op].attack;
+		buf[i++] = (byte) fmchannel[ch].operator[op].decey;
+		buf[i++] = (byte) fmchannel[ch].operator[op].sustain;
+		buf[i++] = (byte) fmchannel[ch].operator[op].sustainLevel;
+		buf[i++] = (byte) fmchannel[ch].operator[op].release;
+		buf[i++] = (byte) fmchannel[ch].operator[op].multiple;
 
-		buf[i++] = (byte) fmchannel[no].operator[op].totalLevel;
-		buf[i++] = (byte) fmchannel[no].operator[op].waveSelect;
-		buf[i++] = (byte) fmchannel[no].operator[op].waveSelect2;			
-		buf[i++] = (byte) fmchannel[no].operator[op].morph;			//use STM32synthesizer
-		buf[i++] = (byte) fmchannel[no].operator[op].morph_once;
+		buf[i++] = (byte) fmchannel[ch].operator[op].totalLevel;
+		buf[i++] = (byte) fmchannel[ch].operator[op].waveSelect;
+		buf[i++] = (byte) fmchannel[ch].operator[op].waveSelect2;			
+		buf[i++] = (byte) fmchannel[ch].operator[op].morph;			//use STM32synthesizer
+		buf[i++] = (byte) fmchannel[ch].operator[op].morph_once;
 		
 	}
 	public  void setOperator(int ch,int op,byte data[]) {
@@ -230,26 +225,20 @@ class FMCHANNEL{
 	
 	
 	
-	public   void getToneData(int no, byte[] buf) {
+	public   void getToneData(int ch, byte[] buf) {
 		int i = 0;
-		buf[i++] = (byte) fmchannel[no].connect ;
+		byte op_buf[] = new byte[OPERATOR_LEN];
+		
+		buf[i++] = (byte) fmchannel[ch].connect ;
+		
 		for(int op = 0; op < MAX_OPERATOR;op++) {
-			buf[i++] = (byte) fmchannel[no].operator[op].feedback;
-			buf[i++] = (byte) fmchannel[no].operator[op].attack;
-			buf[i++] = (byte) fmchannel[no].operator[op].decey;
-			buf[i++] = (byte) fmchannel[no].operator[op].sustain;
-			buf[i++] = (byte) fmchannel[no].operator[op].sustainLevel;
-			buf[i++] = (byte) fmchannel[no].operator[op].release;
-			buf[i++] = (byte) fmchannel[no].operator[op].multiple;
-
-			buf[i++] = (byte) fmchannel[no].operator[op].totalLevel;
-			buf[i++] = (byte) fmchannel[no].operator[op].waveSelect;
-			buf[i++] = (byte) fmchannel[no].operator[op].waveSelect2;			
-			buf[i++] = (byte) fmchannel[no].operator[op].morph;			//use STM32synthesizer
-			buf[i++] = (byte) fmchannel[no].operator[op].morph_once;
-			
-			
+			getOperator(ch,op,op_buf);
+			for(int j = 0; j < OPERATOR_LEN;j++) {
+				buf[i++] = op_buf[j];
+			}
 		}
+		
+
 	}
 
 	public void getToneSet(byte[] buf) {
@@ -266,60 +255,21 @@ class FMCHANNEL{
 	
 	public  void setTone(int ch ,byte data[]) {
 		int i =0;
-		byte a;
+		byte op_buf[] = new byte[OPERATOR_LEN];
+		
+		//byte a;
 		fmchannel[ch].connect = (int)data[i++];
-		for(int op = 0; op < MAX_OPERATOR;op++) {
-			fmchannel[ch].operator[op].feedback = data[i++];
-			fmchannel[ch].operator[op].attack = data[i++];
-			fmchannel[ch].operator[op].decey = 	data[i++];
-			fmchannel[ch].operator[op].sustain = data[i++];
-			fmchannel[ch].operator[op].sustainLevel = data[i++];
-			fmchannel[ch].operator[op].release = data[i++];
-			fmchannel[ch].operator[op].multiple = data[i++];
-			fmchannel[ch].operator[op].totalLevel = data[i++];
-			fmchannel[ch].operator[op].waveSelect = data[i++];
-			a = data[i++];
-			fmchannel[ch].operator[op].waveSelect2 = a;
-			if(a > 7) {
-				fmchannel[ch].operator[op].morph_invert = 1;
-			}else {
-				fmchannel[ch].operator[op].morph_invert = 0;
+		for(int op = 0; op < MAX_OPERATOR; op++) {
+			for(int j = 0; j < OPERATOR_LEN;j++) {
+				op_buf[j] = data[i++];
 			}
-			fmchannel[ch].operator[op].morph = data[i++];
-			fmchannel[ch].operator[op].morph_once = data[i++];
-			
+			setOperator(ch,op,op_buf);
 		}
 
-		sendTone(ch,data);
 		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);		
 	}	
 	
-	public void sendTone(int ch,byte data[]) {
-		int i =0;
-		byte a;
-		setValue(eventSource.Connect,ch,0,data[i++]);
-		for(int op = 0; op < MAX_OPERATOR;op++) {
-			setValue(eventSource.FeedBK,ch,op,data[i++]);
-			setValue(eventSource.SLIDER1,ch,op,data[i++]);
-			setValue(eventSource.SLIDER2 ,ch,op,data[i++]);
-			setValue(eventSource.SLIDER3 ,ch,op,data[i++]);
-			setValue(eventSource.SLIDER4 ,ch,op,data[i++]);
-			setValue(eventSource.SLIDER5 ,ch,op,data[i++]);
-			setValue(eventSource.SLIDER6 ,ch,op,data[i++]);
-			setValue(eventSource.SLIDER7 ,ch,op,data[i++]);
-			setValue(eventSource.Wave ,ch,op,data[i++]);
-			a = data[i++];
-			if(a <8) {
-				setValue(eventSource.Wave2 ,ch,op,a);
-			}else {
-				setValue(eventSource.Wave2,ch,op,a);
-				
-			}
-			setValue(eventSource.Morf ,ch,op,data[i++]);
-			setValue(eventSource.MorphOnce ,ch,op,data[i++]);
-		}
-		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);		
-	}
+
 	
 	public void setToneSet(byte buf[]) {
 		int p = 0;
@@ -331,32 +281,23 @@ class FMCHANNEL{
 			}
 			setTone(ch,tone);
 		}
+
+		if(buf.length == (TONESET_LEN + WAVEDATA_LEN * USERWAVE_VAL)) {
+			int cnt = TONESET_LEN;
+			for(int i = 0; i < USERWAVE_VAL;i++) {
+				for(int j = 0;j < WAVEDATA_LEN;j++) {
+					userWaveData[i][j] = buf[cnt];
+					send_user_wave(i,j,buf[cnt++]);
+				}
+			}
+			notifyChange(MyDataEvent.DATA_UPDATE,eventSource.UserwaveLoad,0,0,0);
+		}
 		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);		
 	}
 	
 	
 	
-//	public void setOpData(int ch,  byte buf[]){		/* Panelから書き込む場合 */
-//		int adr,i;
-//		adr = ch * DATA_LEN;
-//		for(i = 0;i < DATA_LEN;i++){
-//			toneData[adr+ i] = buf[i];
-//			midiDev.write_tonearray(adr+i,(0x00ff & buf[i]));
-//
-//		}
-//		midiDev.writeBurstToneReg();
-//	}
 
-
-//	public  void setTone(int ch,byte data[]) {
-//		int adr = ch * DATA_LEN;
-//		for(int i = 0; i < DATA_LEN;i ++) {
-//			toneData[adr + i] = data[i];
-//			midiDev.write_tonearray(adr + i, data[i]);
-//		}
-//		midiDev.writeBurstToneReg();
-//		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);
-//	}
 
 
 
@@ -564,7 +505,7 @@ class FMCHANNEL{
 
 
 
-	void toneDataInit(){
+	public void toneDataInit(){
 			notifyStop(true);
 			for(int i= 0;i <CHANNEL_VAL;i++){
 				for(int j = 0; j < MAX_OPERATOR;j++) {
@@ -596,50 +537,11 @@ class FMCHANNEL{
 					
 				}
 			}
-			for( int ch = 0;ch < CHANNEL_VAL;ch++) {
-				for(int opno = 0;opno< MAX_OPERATOR;opno++) {
-					midiDev.send_command(eventSource.SLIDER1.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].attack);
-					midiDev.send_command(eventSource.SLIDER2.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].decey);
-					midiDev.send_command(eventSource.SLIDER3.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].sustain);
-					midiDev.send_command(eventSource.SLIDER4.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].sustainLevel);
-					midiDev.send_command(eventSource.SLIDER5.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].release);
-					midiDev.send_command(eventSource.SLIDER6.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].multiple);
-					midiDev.send_command(eventSource.SLIDER7.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].totalLevel);
-					midiDev.send_command(eventSource.Wave.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].waveSelect);
-					midiDev.send_command(eventSource.Wave2.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].waveSelect2);
-					midiDev.send_command(eventSource.Ksl.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].ksl);
-					midiDev.send_command(eventSource.DT.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].dt);
-					midiDev.send_command(eventSource.EAM.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].eam);
-					midiDev.send_command(eventSource.Dam.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].dam);
-					midiDev.send_command(eventSource.EVB.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].evb);
-					midiDev.send_command(eventSource.Dvb.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].dvb);
-					midiDev.send_command(eventSource.Morf.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].morph);
-					midiDev.send_command(eventSource.MorphOnce.getNumber(), ch, opno, 
-							fmchannel[ch].operator[opno].morph_once);
-					
-	//				midiDev.send_command(eventSource.Wave.getNumber(), ch, opno, 
-	//						fmchannel[ch].operator[opno].waveSelect);
-	//				midiDev.send_command(eventSource.Wave2.getNumber(), ch, opno, 
-	//						fmchannel[ch].operator[opno].waveSelect2);
-					
-				}
-			}
+			
+			byte tonedata[] = new byte[TONESET_LEN];
+			getToneSet(tonedata);
+			setToneSet(tonedata);
+
 			notifyStop(false);
 	}
 
@@ -660,13 +562,13 @@ class FMCHANNEL{
 /* -------------------------------------------- */
 
 
-public void noteOn(int ch,int noteNo,int vel){
-	midiDev.send_command(16,ch,noteNo,vel);
-}
-
-public void noteOff(int ch,int noteNo){
-	midiDev.send_command(17,ch,noteNo,0);
-}
+//public void noteOn(int ch,int noteNo,int vel){
+//	midiDev.send_command(16,ch,noteNo,vel);
+//}
+//
+//public void noteOff(int ch,int noteNo){
+//	midiDev.send_command(17,ch,noteNo,0);
+//}
 
 
 
@@ -756,6 +658,17 @@ public void changeSmodulateDelay(int midiChannelNo,int delayValue) {
 	}
 	public int getChannelVal() {
 		return CHANNEL_VAL;
+	}
+	
+	public int getMaxWaveform() {
+		return MAX_WAVE_FORM;
+	}
+	
+	public int getWavedataLen() {
+		return WAVEDATA_LEN;
+	}
+	public int getUserWaveVal() {
+		return USERWAVE_VAL;
 	}
 
 	
