@@ -16,7 +16,7 @@ import javafx.event.EventType;
 public class FMDEVICE  {
 static	final int  MAGIC_NO	= 0x60;
 static final int MAX_OPERATOR = 4;
-static	final int OPERATOR_LEN = 12;
+static	final int OPERATOR_LEN = 13;
 static  final int  DATA_LEN = OPERATOR_LEN * MAX_OPERATOR + 1;
 static final int CHANNEL_VAL = 5;
 static  final int  TONESET_LEN = DATA_LEN * CHANNEL_VAL;
@@ -31,18 +31,18 @@ static final int USERWAVE_VAL = 4;
 
 
 
-static final int OFS_AR 		= 0;
-static final int OFS_DR			= 1;
-static final int OFS_SR 		= 2;
-static final int OFS_SL 		= 3;
-static final int OFS_RR			= 4;
-static final int OFS_MULTI	 	= 5;
-static final int OFS_TLV 		= 6;
-static final int OFS_FB		 	= 7;
-static final int OFS_WS			= 8;
-static final int OFS_MOF		= 9;
-static final int OFS_WS2		=10;
-static final int OFS_MOFONE		=11;
+//static final int OFS_AR 		= 0;
+//static final int OFS_DR			= 1;
+//static final int OFS_SR 		= 2;
+//static final int OFS_SL 		= 3;
+//static final int OFS_RR			= 4;
+//static final int OFS_MULTI	 	= 5;
+//static final int OFS_TLV 		= 6;
+//static final int OFS_FB		 	= 7;
+//static final int OFS_WS			= 8;
+//static final int OFS_MOF		= 9;
+//static final int OFS_WS2		=10;
+//static final int OFS_MOFONE		=11;
 
 
 
@@ -71,6 +71,10 @@ class OPERATOR{
 	int morph;			//use STM32synthesizer
 	int morph_once;
 	int morph_invert;
+	
+	int operatorLPF;
+	
+	
 };
 
 class FMCHANNEL{
@@ -125,7 +129,7 @@ class FMCHANNEL{
 	}
 
 	
-/* 変更通知 */
+/*a 変更通知 */
 	public void attach(Observer o) {
 		if(observers == null) {
 			observers = new Vector<Observer>();
@@ -172,6 +176,7 @@ class FMCHANNEL{
 		buf[i++] = (byte) fmchannel[ch].operator[op].waveSelect2;			
 		buf[i++] = (byte) fmchannel[ch].operator[op].morph;			//use STM32synthesizer
 		buf[i++] = (byte) fmchannel[ch].operator[op].morph_once;
+		buf[i++] = (byte) fmchannel[ch].operator[op].operatorLPF;
 		
 	}
 	public  void setOperator(int ch,int op,byte data[]) {
@@ -195,6 +200,7 @@ class FMCHANNEL{
 		}
 		fmchannel[ch].operator[op].morph = data[i++];
 		fmchannel[ch].operator[op].morph_once = data[i++];
+		fmchannel[ch].operator[op].operatorLPF = data[i++];
 		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);
 		sendOperator(ch,op,data);
 	}
@@ -220,6 +226,7 @@ class FMCHANNEL{
 		}
 		setValue(eventSource.Morf ,ch,op,data[i++]);
 		setValue(eventSource.MorphOnce ,ch,op,data[i++]);		
+		setValue(eventSource.operatorLPF,ch,op,data[i++]);
 		notifyChange(MyDataEvent.DATA_UPDATE,eventSource.ToneChange,0,0,0);		
 	}
 	
@@ -383,9 +390,13 @@ class FMCHANNEL{
 			
 		case Invert:
 			val = fmchannel[ch].operator[opno].morph_invert;
+			break;
 			
 		case Connect:
 			val = fmchannel[ch].connect;
+			break;
+		case operatorLPF:
+			val = fmchannel[ch].operator[opno].operatorLPF;
 
 		default:
 			break;
@@ -493,6 +504,10 @@ class FMCHANNEL{
 			case Connect:
 				fmchannel[ch].connect = val;
 				break;
+			case operatorLPF:
+				fmchannel[ch].operator[opno].operatorLPF = val;
+			
+				break;
 			default:
 				return;
 				//break;
@@ -534,6 +549,8 @@ class FMCHANNEL{
 					fmchannel[i].operator[j].morph = 0;
 					fmchannel[i].operator[j].morph_once = 0;
 					fmchannel[i].operator[j].morph_invert = 0;
+					
+					fmchannel[i].operator[j].operatorLPF = 0;
 					
 				}
 			}
@@ -620,8 +637,6 @@ public void changeSmodulateDelay(int midiChannelNo,int delayValue) {
 		toneDataInit();
 
 	}
-
-
 
 
 	public void notifyChange(EventType<MyDataEvent> e,eventSource source,int ch, int op,int val) {

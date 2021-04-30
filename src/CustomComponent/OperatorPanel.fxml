@@ -32,6 +32,7 @@
          <Label fx:id="valueLabel" layoutX="147.0" layoutY="226.0" prefHeight="17.0" prefWidth="21.0" text="0" />
       	 <Label fx:id="valueLabel2" layoutX="147.0" layoutY="282.0" prefHeight="17.0" prefWidth="21.0" text="0" />
       <RadioButton fx:id="morph_once" layoutX="79.0" layoutY="334.0" mnemonicParsing="false" onAction="#change_MorphCycle" text="Morph at once" />
+      <RadioButton fx:id="operatorLPF" layoutX="160.0" layoutY="303.0" mnemonicParsing="false" onAction="#operatorLPF" text="LPF" />
 
 	</children>
 	

@@ -135,6 +135,7 @@ public class FMToneEditorController implements MyDataListener , Observer{
 			setPanel();
 		}else {
 			fmDevice.setValue(source, currentChannel, opNo, val);
+		
 		}
 	}
 
@@ -191,7 +192,8 @@ public class FMToneEditorController implements MyDataListener , Observer{
 //			operatorArray[opno].setDVB(
 //					(double) toneData.getValue(currentChannel, opno, eventSource.Dvb));
 			
-			
+			operatorArray[opno].setOperatorLPF(
+					fmDevice.getValue(currentChannel, opno, eventSource.operatorLPF));
 		}
 		fmDevice.notifyStop(false);		
 		

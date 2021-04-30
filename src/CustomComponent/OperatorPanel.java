@@ -60,7 +60,7 @@ public class OperatorPanel extends Pane
 	@FXML ComboBox<String> waveSelect2;
 
 
-
+	@FXML RadioButton operatorLPF;
 
 	@FXML Label valueLabel;
 	@FXML Label valueLabel2;
@@ -193,7 +193,7 @@ public class OperatorPanel extends Pane
 		waveSelect2.setCellFactory(c->new StatusListCell());
 		waveSelect2.setButtonCell(new StatusListCell());
 		waveSelect2.setValue(options2.get(0));
-
+		operatorLPF.setSelected(false);
 		readOperatorProperties();
 
 
@@ -236,8 +236,6 @@ public class OperatorPanel extends Pane
 			slider6.setMax(Double.parseDouble(properties.getProperty("slider6Max")));
 			slider7.setMax(Double.parseDouble(properties.getProperty("slider7Max")));
 
-
-
 			istream.close();
 
 		}catch(IOException e){
@@ -249,19 +247,14 @@ public class OperatorPanel extends Pane
 
 	@FXML
 	void invert_Waveform2() {
-		
+
 		int i = options2.indexOf(    waveSelect2.getValue());
 		if(invert.isSelected() == true) {
 			changeValue(i+16, eventSource.Wave2);
 		}else {
 			changeValue(i, eventSource.Wave2);
 		}
-
-		
-
 	}
-
-
 
 
 	@FXML
@@ -273,7 +266,6 @@ public class OperatorPanel extends Pane
 			changeValue(i, eventSource.Wave);
 		}
 		valueLabel.setText(i+1 + "");
-
 	}
 
 	@FXML
@@ -325,10 +317,10 @@ public class OperatorPanel extends Pane
 		if(val > 15) {
 			val = val - 16;
 		}
-		
+
 		waveSelect.setValue(options.get(val));
 	}
-	
+
 	public void setWave2(int val) {
 		if(val > 15) {
 			val = val - 16;
@@ -366,6 +358,13 @@ public class OperatorPanel extends Pane
 			invert.setSelected(true);
 		}
 	}
+	public void setOperatorLPF(int val) {
+		if(val == 0) {
+			operatorLPF.setSelected(false);
+		}else {
+			operatorLPF.setSelected(true);
+		}
+	}
 
 	public void addListener(MyDataListener listener) {
 		this.listener = listener;
@@ -380,6 +379,14 @@ public class OperatorPanel extends Pane
 			changeValue(0,eventSource.MorphOnce);
 		}
 
+	}
+	
+	@FXML public void operatorLPF() {
+		if(operatorLPF.isSelected()== true) {
+			changeValue(1,eventSource.operatorLPF);
+			}else {
+			changeValue(0,eventSource.operatorLPF);
+		}
 	}
 
 
